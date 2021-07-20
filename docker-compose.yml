@@ -1,0 +1,47 @@
+# versao defini o set de funcionalidades dentro do compose
+version: '3.3'
+volumes:
+    dados:
+    #wordpress:
+networks:
+    back:
+
+services:
+    wordpress:
+        build: .
+        restart: always
+        ports:
+            - 8081:80
+        environment: 
+            WORDPRESS_DB_HOST: dados
+            WORDPRESS_DB_USER: wpuser
+            WORDPRESS_DB_PASSWORD: wppass
+            WORDPRESS_DB_NAME: bd_sitedev
+        #volumes:
+            #- wordpress:/var/www/html
+            #- ./saberplay.com.br:/var/www/html
+            #- ./saberplay.com.br/wp-content/:/var/www/html/wp-content
+            #- ./saberplay.com.br/wp-content/themes:/var/www/html/wp-content/themes
+        networks:
+            - back
+    dados:
+        image: mysql:5.7
+        restart: always
+        environment: 
+            MYSQL_DATABASE: bd_sitedev
+            MYSQL_USER: wpuser
+            MYSQL_PASSWORD: wppass
+            MYSQL_ROOT_PASSWORD: pass1
+        volumes: 
+            - dados:/var/lib/mysql
+        networks:
+            - back
+    adminer:
+        depends_on: 
+            - dados
+        image: adminer
+        restart: always
+        ports: 
+            - 8888:8080
+        networks:
+            - back
